@@ -1485,7 +1485,9 @@ def enviar_email(destino, assunto, texto_email, html_email=None):
 
 def recarregar_email():
     """Relê o e-mail do .env (quem configurou com o servidor ligado não precisa reiniciar)."""
-    valores = config.ler_env(config.ARQUIVO_ENV)
+    # Na Vercel não existe .env: os dados vêm só das variáveis de ambiente.
+    valores = config.ler_env(config.ARQUIVO_ENV) if os.path.exists(config.ARQUIVO_ENV) else {}
+    valores.update({chave: os.environ[chave] for chave in config.CHAVES_DO_AMBIENTE if os.environ.get(chave)})
     cfg.EMAIL_USUARIO = (valores.get('EMAIL_USUARIO') or '').strip()
     cfg.EMAIL_SENHA_APP = (valores.get('EMAIL_SENHA_APP') or '').replace(' ', '')
     cfg.EMAIL_SERVIDOR = (valores.get('EMAIL_SERVIDOR') or 'smtp.gmail.com').strip()
