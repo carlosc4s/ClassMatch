@@ -242,5 +242,12 @@ def carregar():
     cfg.SUPABASE_CHAVE_SECRETA = (valores.get('SUPABASE_CHAVE_SECRETA') or '').strip()
     cfg.SUPABASE_BUCKET = (valores.get('SUPABASE_BUCKET') or cfg.SUPABASE_BUCKET).strip()
 
+    # O pooler do Supabase só aceita o usuário no formato "postgres.ID_DO_PROJETO".
+    # Se veio só "postgres" (ou nada), completa com o ID tirado do SUPABASE_URL.
+    if cfg.DB_TIPO == 'postgres' and 'pooler.supabase.com' in cfg.DB_HOST.lower() and '.' not in cfg.DB_USER:
+        projeto = (urllib.parse.urlsplit(cfg.SUPABASE_URL).hostname or '').split('.')[0] if cfg.SUPABASE_URL else ''
+        if projeto and projeto.lower() != 'seu_projeto':
+            cfg.DB_USER = f"{'postgres' if cfg.DB_USER == 'root' else cfg.DB_USER}.{projeto}"
+
     cfg.SECRET_KEY = _chave_secreta(valores)
     return cfg

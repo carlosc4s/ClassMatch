@@ -71,6 +71,10 @@ def traduzir_erro(erro, cfg):
 
     if psycopg2 is not None and isinstance(erro, psycopg2.Error):
         texto = str(erro).lower()
+        if 'tenant identifier' in texto or 'enoidentifier' in texto:
+            return (f'O Supabase não reconheceu o usuário "{cfg.DB_USER}". No pooler ele precisa ser '
+                    '"postgres.ID_DO_PROJETO" (no site do Supabase: Connect > Session pooler, campo user). '
+                    'Corrija o DB_USER no backend/.env ou nas variáveis da Vercel (e faça Redeploy).')
         if 'password authentication failed' in texto or 'tenant or user not found' in texto:
             return ('O Supabase recusou o usuário/senha do backend/.env. Confira DB_USER e DB_PASSWORD '
                     '(no site do Supabase: Connect > Session pooler).')
