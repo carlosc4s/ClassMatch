@@ -16,6 +16,13 @@ PASTA_PROJETO = os.path.dirname(PASTA_BACKEND)
 PASTA_FRONTEND = os.path.join(PASTA_PROJETO, 'frontend')
 ARQUIVO_ENV = os.path.join(PASTA_BACKEND, '.env')
 ARQUIVO_CHAVE = os.path.join(PASTA_BACKEND, '.chave_secreta')
+# Na Vercel não existe .env nem disco gravável: os dados vêm das "Environment Variables" do projeto.
+NA_VERCEL = bool(os.environ.get('VERCEL'))
+CHAVES_DO_AMBIENTE = (
+    'DB_TIPO', 'DB_HOST', 'DB_PORT', 'DB_USER', 'DB_PASSWORD', 'DB_NAME', 'DB_FUSO', 'PORTA',
+    'SECRET_KEY', 'UPLOAD_MAX_MB', 'EMAIL_USUARIO', 'EMAIL_SENHA_APP', 'EMAIL_SERVIDOR', 'EMAIL_PORTA',
+    'SITE_URL', 'SUPABASE_URL', 'SUPABASE_CHAVE_SECRETA', 'SUPABASE_BUCKET',
+)
 
 SENHAS_DE_EXEMPLO = {'sua_senha_aqui', 'sua_senha_real_aqui', 'SUA_SENHA_AQUI'}
 
@@ -138,6 +145,10 @@ def _chave_secreta(valores):
     """Chave que assina os tokens de login. Fica salva para o login sobreviver a reinícios."""
     if valores.get('SECRET_KEY'):
         return valores['SECRET_KEY']
+    if NA_VERCEL:
+        # Cada instância da Vercel geraria uma chave diferente e o login cairia sozinho.
+        print('AVISO: falta a variável SECRET_KEY na Vercel. Os logins vão cair a toda hora.')
+        return secrets.token_hex(32)
     try:
         if os.path.exists(ARQUIVO_CHAVE):
             with open(ARQUIVO_CHAVE, encoding='utf-8') as arquivo:
@@ -161,7 +172,7 @@ def carregar():
         print('       vou usar mesmo assim, mas o ideal é renomear para ".env".')
         arquivo = arquivo + '.txt'
 
-    if not os.path.exists(arquivo):
+    if not os.path.exists(arquivo) and not NA_VERCEL:
         if sys.stdin and sys.stdin.isatty():
             _perguntar_dados_do_mysql()
         else:
@@ -169,6 +180,8 @@ def carregar():
             print('       Copie .env.example para .env e coloque a senha do seu MySQL.')
 
     valores = ler_env(arquivo) if os.path.exists(arquivo) else {}
+    # Variáveis de ambiente (as da Vercel) valem mais que o .env.
+    valores.update({chave: os.environ[chave] for chave in CHAVES_DO_AMBIENTE if os.environ.get(chave)})
 
     cfg = Config()
     cfg.DB_HOST = valores.get('DB_HOST', cfg.DB_HOST) or cfg.DB_HOST
@@ -215,7 +228,10 @@ def carregar():
         pass
     cfg.EMAIL_ATIVO = bool(cfg.EMAIL_USUARIO and cfg.EMAIL_SENHA_APP)
     # Endereço do site usado no link do e-mail (mude se o site estiver em outro endereço)
-    cfg.SITE_URL = (valores.get('SITE_URL') or f'http://127.0.0.1:{cfg.PORTA}').strip().rstrip('/')
+    site_padrao = f'http://127.0.0.1:{cfg.PORTA}'
+    if NA_VERCEL and os.environ.get('VERCEL_PROJECT_PRODUCTION_URL'):
+        site_padrao = 'https://' + os.environ['VERCEL_PROJECT_PRODUCTION_URL']
+    cfg.SITE_URL = (valores.get('SITE_URL') or site_padrao).strip().rstrip('/')
 
     # Aceita o endereço do projeto com ou sem /rest/v1 no final (fica só https://xxxx.supabase.co)
     url = (valores.get('SUPABASE_URL') or '').strip()

@@ -1,0 +1,5 @@
+# Bibliotecas que a Vercel instala (as mesmas do backend/requirements.txt).
+Flask>=3.0,<4
+PyMySQL>=1.1
+psycopg2-binary>=2.9
+cryptography>=42

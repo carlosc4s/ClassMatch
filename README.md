@@ -271,3 +271,14 @@ Computadores de laboratório costumam ter regras do Windows ("política de grupo
 
 - Cruzar `disponibilidade_horarios` no match (hoje o match usa matéria + nível).
 - Tela para a coordenação editar a tabela `palavras_filtradas` e cadastrar escolas.
+
+## Publicar na Vercel
+
+O repositório já vem pronto (`vercel.json`, `api/index.py` e `requirements.txt` na raiz). A Vercel entrega a pasta `frontend/` como site e roda o Flask só nas rotas `/api/...`. No computador nada muda: continue usando o `INICIAR.bat`.
+
+1. Na Vercel: **Settings > Build and Deployment**: *Framework Preset* = **Other** e *Root Directory* **vazio** (a raiz do repositório, não `backend`).
+2. **Settings > Environment Variables**: cadastre as mesmas chaves do `backend/.env` (o banco tem que ser o **Supabase**; o MySQL do seu computador não é acessível pela internet):
+   `DB_TIPO`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_FUSO` e **`SECRET_KEY`** (obrigatória: um texto longo e aleatório, senão os logins caem sozinhos). Opcionais: `EMAIL_USUARIO`, `EMAIL_SENHA_APP`, `SITE_URL`, `SUPABASE_URL`, `SUPABASE_CHAVE_SECRETA`.
+3. Faça um novo deploy (**Deployments > ... > Redeploy**).
+
+As tabelas não são criadas pela Vercel: crie antes no Supabase (SQL Editor com o `database/banco_postgres.sql`, ou rodando o ClassMatch uma vez no computador apontando para o Supabase).
