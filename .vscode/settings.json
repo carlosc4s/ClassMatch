@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "**/__pycache__": true,
+        "backend/bibliotecas": true
+    },
+    "search.exclude": {
+        "backend/bibliotecas": true
+    }
+}

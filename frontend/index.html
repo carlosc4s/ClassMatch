@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassMatch — Aprenda, ensine e evolua junto</title>
+<link rel="icon" href="img/simbolo-claro.png">
+<script>try{document.documentElement.dataset.tema=localStorage.getItem('classmatch_tema')||(matchMedia('(prefers-color-scheme: dark)').matches?'escuro':'claro')}catch(e){document.documentElement.dataset.tema='claro'}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topo"></header>
+
+<main>
+    <section class="hero">
+        <div>
+            <span class="etiqueta">Monitoria entre alunos da mesma escola</span>
+            <h1>Aprenda, ensine e <span class="destaque">evolua junto.</span></h1>
+            <p class="lead">O ClassMatch conecta estudantes que precisam aprender com estudantes que podem ensinar,
+                facilitando a criação de parcerias de estudo dentro da comunidade escolar.</p>
+            <div class="hero-botoes" id="hero-botoes">
+                <a href="entrar.html#cadastro" class="btn btn-primary">Começar agora</a>
+                <a href="#como-funciona" class="btn btn-ghost">Como funciona</a>
+            </div>
+        </div>
+        <div class="hero-logo">
+            <img src="img/logo-claro.png" alt="Logo ClassMatch" class="so-claro">
+            <img src="img/logo-escuro.png" alt="Logo ClassMatch" class="so-escuro">
+        </div>
+    </section>
+
+    <section class="faixa-secao" id="como-funciona">
+        <h2>Como funciona</h2>
+        <p class="sub">Do cadastro à avaliação, em sete passos.</p>
+        <div class="grade">
+            <div class="card passo"><span class="passo-num">01</span><span class="passo-icone"><i data-icone="novoUsuario"></i></span><h3>Cadastre-se</h3><p>Crie sua conta com o seu e-mail em menos de um minuto.</p></div>
+            <div class="card passo"><span class="passo-num">02</span><span class="passo-icone"><i data-icone="lampada"></i></span><h3>Conte o que você sabe</h3><p>Escolha as matérias e o nível em que você pode ajudar.</p></div>
+            <div class="card passo"><span class="passo-num">03</span><span class="passo-icone"><i data-icone="ajuda"></i></span><h3>Conte o que precisa</h3><p>Descreva a dúvida, a matéria e o nível, ou entre numa aula em grupo.</p></div>
+            <div class="card passo"><span class="passo-num">04</span><span class="passo-icone"><i data-icone="alvo"></i></span><h3>Encontre seu Match</h3><p>O sistema mostra os pedidos mais compatíveis para cada monitor.</p></div>
+            <div class="card passo"><span class="passo-num">05</span><span class="passo-icone"><i data-icone="mensagem"></i></span><h3>Converse</h3><p>O chat abre na hora, e dá para marcar uma reunião no Google Meet.</p></div>
+            <div class="card passo"><span class="passo-num">06</span><span class="passo-icone"><i data-icone="livro"></i></span><h3>Faça a monitoria</h3><p>Resolvam a dúvida juntos, no seu ritmo.</p></div>
+            <div class="card passo"><span class="passo-num">07</span><span class="passo-icone"><i data-icone="estrela"></i></span><h3>Avalie</h3><p>Deixe de 1 a 5 estrelas e ajude a melhorar a comunidade.</p></div>
+        </div>
+    </section>
+
+    <section class="faixa-secao">
+        <h2>Por que usar o ClassMatch</h2>
+        <p class="sub">Feito para a rotina da escola.</p>
+        <div class="grade">
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="livro"></i></span><h3>Aprendizagem colaborativa</h3><p>Quem explica também aprende mais.</p></div>
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="usuarios"></i></span><h3>Conexão entre estudantes</h3><p>Ajuda de quem vive a mesma escola que você.</p></div>
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="alvo"></i></span><h3>Match inteligente</h3><p>Compara a matéria e o nível de quem ensina e de quem pede.</p></div>
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="mensagem"></i></span><h3>Comunicação</h3><p>Chat de texto moderado, dentro do ClassMatch.</p></div>
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="estrela"></i></span><h3>Avaliação</h3><p>Reputação construída a cada monitoria.</p></div>
+            <div class="card beneficio"><span class="beneficio-icone"><i data-icone="escudo"></i></span><h3>Ambiente moderado</h3><p>Filtro automático e acompanhamento da coordenação.</p></div>
+        </div>
+    </section>
+
+    <section class="faixa-secao">
+        <div class="card cta">
+            <h2>Pronto para encontrar seu Match?</h2>
+            <p>Leva menos de um minuto para começar.</p>
+            <a href="entrar.html#cadastro" class="btn" id="cta-botao">Criar minha conta</a>
+        </div>
+    </section>
+</main>
+
+<footer id="rodape"></footer>
+<script src="api.js"></script>
+<script src="layout.js"></script>
+<script>
+    // Recado de despedida depois de excluir a conta.
+    try {
+        const recadoOk = sessionStorage.getItem('classmatch_recado_ok');
+        if (recadoOk) {
+            sessionStorage.removeItem('classmatch_recado_ok');
+            document.querySelector('main').prepend(h('div', { class: 'container' },
+                h('div', { class: 'msg show ok', role: 'status' }, recadoOk)));
+        }
+    } catch (_) { /* navegador sem armazenamento */ }
+    // Quem já está logado vai direto para o painel.
+    if (sessao.obter()) {
+        document.getElementById('hero-botoes').replaceChildren(
+            h('a', { href: 'dashboard.html', class: 'btn btn-primary' }, 'Ir para o meu painel'),
+            h('a', { href: '#como-funciona', class: 'btn btn-ghost' }, 'Como funciona'));
+        const cta = document.getElementById('cta-botao');
+        cta.href = 'dashboard.html';
+        cta.textContent = 'Abrir meu painel';
+    }
+</script>
+</body>
+</html>

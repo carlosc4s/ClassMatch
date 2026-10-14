@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassMatch — Ajuda</title>
+<link rel="icon" href="img/simbolo-claro.png">
+<script>try{document.documentElement.dataset.tema=localStorage.getItem('classmatch_tema')||(matchMedia('(prefers-color-scheme: dark)').matches?'escuro':'claro')}catch(e){document.documentElement.dataset.tema='claro'}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topo"></header>
+
+<main class="container" style="max-width:860px">
+    <div class="voltar-linha">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="history.length > 1 ? history.back() : location.href = 'index.html'">← Voltar</button>
+        <a href="index.html" class="btn btn-ghost btn-sm"><i data-icone="casa"></i> Início</a>
+    </div>
+    <h1 style="font-size:2rem">Central de ajuda</h1>
+    <p class="muted">Respostas rápidas para as dúvidas mais comuns.</p>
+
+    <div class="faq section">
+        <details class="card"><summary>O que é o ClassMatch?</summary>
+            <div class="resposta">Uma plataforma de monitoria entre alunos da mesma escola: quem tem dúvida pede ajuda, quem sabe a matéria ensina.</div></details>
+        <details class="card"><summary>Como criar uma conta?</summary>
+            <div class="resposta"><ol><li>Clique em <strong>Criar conta</strong> no topo.</li><li>Preencha nome, e-mail e data de nascimento.</li><li>Pronto! No painel você escolhe <strong>Quero aprender</strong> ou <strong>Quero ensinar</strong> (dá para fazer os dois).</li></ol></div></details>
+        <details class="card"><summary>Como informar minhas matérias?</summary>
+            <div class="resposta">Monitores: no <strong>Dashboard</strong>, em "Matérias que eu ensino", escolha a matéria e o seu nível. Alunos: a matéria que você quer aprender vai no pedido de ajuda e aparece no seu perfil.</div></details>
+        <details class="card"><summary>Como encontrar um Match?</summary>
+            <div class="resposta">O aluno envia um pedido de ajuda. Os monitores daquela matéria veem o pedido com a porcentagem de compatibilidade (matéria + nível) e aceitam o que combina com eles.</div></details>
+        <details class="card"><summary>Como iniciar uma monitoria?</summary>
+            <div class="resposta">Quando um monitor clica em <strong>Aceitar e conversar</strong>, a monitoria começa e o chat abre para os dois. Ao terminar, qualquer um clica em <strong>Encerrar</strong> e os dois podem se avaliar.</div></details>
+        <details class="card"><summary>Como funcionam as aulas em grupo?</summary>
+            <div class="resposta">Quem ensina cria uma aula com data, hora, número de vagas e o link do Google Meet. Os colegas se inscrevem em <strong>Quero aprender &gt; Aulas em grupo</strong> e todos entram no mesmo chat da turma.</div></details>
+        <details class="card"><summary>Como usar o Google Meet?</summary>
+            <div class="resposta">Crie a reunião em meet.google.com (Nova reunião) e cole o link no botão <strong>Link do Meet</strong> do chat. Aparece para todos o botão <strong>Entrar na reunião</strong>.</div></details>
+        <details class="card"><summary>Como utilizar o chat?</summary>
+            <div class="resposta">Abra <strong>Mensagens</strong> no menu e escolha a monitoria. As mensagens chegam sozinhas. Por segurança, telefone, redes sociais e palavrões são filtrados automaticamente.</div></details>
+        <details class="card"><summary>Dá para enviar arquivos ou áudio?</summary>
+            <div class="resposta">Não. As conversas no ClassMatch são só por texto. Para explicar algo ao vivo, use o botão <strong>Link do Meet</strong> no chat e marquem uma reunião no Google Meet.</div></details>
+        <details class="card"><summary>Como mudar o tema?</summary>
+            <div class="resposta">Clique no botão de lua/sol do cabeçalho. A escolha fica salva no seu navegador.</div></details>
+        <details class="card"><summary>Como voltar para o início?</summary>
+            <div class="resposta">Clique na logo do ClassMatch ou em <strong>Início</strong>, em qualquer página.</div></details>
+    </div>
+
+    <section class="card" id="contato">
+        <h2>Precisa de ajuda?</h2>
+        <p class="muted">Fale com a equipe do ClassMatch.</p>
+        <p><i data-icone="telefone"></i> +55 11 91324-5005<br><i data-icone="email"></i> classmatch0@gmail.com</p>
+        <div class="contato-botoes">
+            <a class="btn btn-whats" target="_blank" rel="noopener"
+               href="https://wa.me/5511913245005?text=Ol%C3%A1!%20Preciso%20de%20ajuda%20com%20o%20ClassMatch.">Conversar pelo WhatsApp</a>
+            <a class="btn btn-ghost" href="mailto:classmatch0@gmail.com?subject=Ajuda%20ClassMatch">Enviar e-mail</a>
+        </div>
+    </section>
+</main>
+
+<footer id="rodape"></footer>
+<script src="api.js"></script>
+<script src="layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassMatch — Painel</title>
+<link rel="icon" href="img/simbolo-claro.png">
+<script>try{document.documentElement.dataset.tema=localStorage.getItem('classmatch_tema')||(matchMedia('(prefers-color-scheme: dark)').matches?'escuro':'claro')}catch(e){document.documentElement.dataset.tema='claro'}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topo"></header>
+
+<div class="faixa" id="faixa-servidor" role="alert" hidden></div>
+<div class="faixa faixa-aviso" id="faixa-advertencia" role="status" hidden>
+    <span id="faixa-advertencia-texto"></span>
+    <button type="button" class="btn btn-ghost btn-sm" id="faixa-advertencia-fechar">Entendi</button>
+</div>
+
+<main class="container">
+
+<!-- ======================= PAINEL ======================= -->
+<div id="view-painel">
+    <div class="boas-vindas">
+        <div>
+            <h1>Olá, <span id="ola-nome">…</span></h1>
+            <p class="muted" id="ola-sub" style="margin:0"></p>
+        </div>
+        <span class="badge azul" id="user-tipo"></span>
+    </div>
+    <nav class="atalhos" id="atalhos" aria-label="Atalhos"></nav>
+
+    <!-- Estudante: escolhe o que quer fazer agora (dá para trocar a qualquer momento) -->
+    <div class="modo-escolha" id="modo-escolha" role="tablist" aria-label="O que você quer fazer" hidden>
+        <button type="button" class="modo-btn" data-modo="aprender" role="tab">
+            <i data-icone="ajuda"></i><span><strong>Quero aprender</strong><small>Peça ajuda e entre em aulas em grupo</small></span>
+        </button>
+        <button type="button" class="modo-btn" data-modo="ensinar" role="tab">
+            <i data-icone="lampada"></i><span><strong>Quero ensinar</strong><small>Ajude colegas e crie aulas em grupo</small></span>
+        </button>
+    </div>
+
+    <!-- ALUNO -->
+    <div id="view-aluno" hidden>
+        <section class="section" id="sec-pedir">
+            <div class="section-head"><h2>Pedir ajuda</h2></div>
+            <form id="form-solicitacao" class="card">
+                <div class="field-row">
+                    <div class="field">
+                        <label for="sol-materia">Matéria que quero aprender <span class="obrigatorio">*</span></label>
+                        <select id="sol-materia" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="sol-nivel">Nível da dúvida <span class="obrigatorio">*</span></label>
+                        <select id="sol-nivel" required>
+                            <option value="basico">Básico</option>
+                            <option value="intermediario">Intermediário</option>
+                            <option value="avancado">Avançado</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="field-dica" id="sol-dica"></p>
+                <div class="field">
+                    <label for="sol-desc">Descreva sua dúvida <span class="obrigatorio">*</span></label>
+                    <textarea id="sol-desc" minlength="5" maxlength="500" required
+                              placeholder="Ex.: não entendi como funciona laço de repetição em Python"></textarea>
+                    <div class="contador" id="sol-contador">0/500</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar pedido</button>
+            </form>
+        </section>
+        <section class="section" id="sec-solicitacoes">
+            <div class="section-head"><h2>Meus pedidos</h2><span class="count" id="count-solicitacoes"></span></div>
+            <div id="lista-solicitacoes"><div class="carregando">Carregando...</div></div>
+        </section>
+        <section class="section" id="sec-aulas">
+            <div class="section-head"><h2>Aulas em grupo</h2><span class="count" id="count-aulas"></span></div>
+            <p class="muted" style="margin-top:-6px;font-size:.92rem">Um monitor ensina a turma toda, com chat coletivo e Google Meet.</p>
+            <div id="lista-aulas"><div class="carregando">Carregando...</div></div>
+        </section>
+    </div>
+
+    <!-- MONITOR -->
+    <div id="view-monitor" hidden>
+        <section class="section" id="sec-materias">
+            <div class="section-head"><h2>Matérias que eu ensino</h2></div>
+            <form id="form-minha-materia" class="card" style="margin-bottom:14px">
+                <div class="field-row">
+                    <div class="field">
+                        <label for="mm-materia">Matéria</label>
+                        <select id="mm-materia" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="mm-nivel">Meu nível nessa matéria</label>
+                        <select id="mm-nivel" required>
+                            <option value="basico">Básico</option>
+                            <option value="intermediario">Intermediário</option>
+                            <option value="avancado">Avançado</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-ghost btn-sm">+ Adicionar matéria</button>
+            </form>
+            <div id="lista-minhas-materias" class="lista-materias"></div>
+        </section>
+        <section class="section" id="sec-pendentes">
+            <div class="section-head"><h2>Possíveis matches</h2><span class="count" id="count-pendentes"></span></div>
+            <div id="lista-pendentes"><div class="carregando">Carregando...</div></div>
+        </section>
+        <section class="section" id="sec-minhas-aulas">
+            <div class="section-head"><h2>Minhas aulas em grupo</h2></div>
+            <form id="form-aula" class="card" style="margin-bottom:14px">
+                <p class="muted" style="font-size:.92rem">Ensine vários colegas de uma vez. Quem se inscrever entra no chat da turma.</p>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="aula-materia">Matéria <span class="obrigatorio">*</span></label>
+                        <select id="aula-materia" required></select>
+                    </div>
+                    <div class="field">
+                        <label for="aula-titulo">Título <span class="obrigatorio">*</span></label>
+                        <input type="text" id="aula-titulo" minlength="3" maxlength="120" placeholder="Ex.: Revisão de funções para a prova" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="aula-descricao">O que vai ser visto</label>
+                    <textarea id="aula-descricao" maxlength="500" placeholder="Ex.: exercícios de função do 1º grau, tragam dúvidas!"></textarea>
+                </div>
+                <div class="field-row">
+                    <div class="field">
+                        <label for="aula-data">Data e hora <span class="obrigatorio">*</span></label>
+                        <input type="datetime-local" id="aula-data" required>
+                    </div>
+                    <div class="field">
+                        <label for="aula-duracao">Duração</label>
+                        <select id="aula-duracao">
+                            <option value="30">30 minutos</option><option value="45">45 minutos</option>
+                            <option value="60" selected>1 hora</option><option value="90">1 hora e meia</option>
+                            <option value="120">2 horas</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="aula-vagas">Vagas <span class="obrigatorio">*</span></label>
+                        <input type="number" id="aula-vagas" min="2" max="50" value="10" required>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="aula-meet">Link do Google Meet (opcional)</label>
+                    <input type="url" id="aula-meet" placeholder="https://meet.google.com/abc-defg-hij">
+                </div>
+                <p class="field-dica">Para criar o link: entre em meet.google.com, clique em "Nova reunião" e copie o endereço. Dá para colocar depois.</p>
+                <button type="submit" class="btn btn-primary">Criar aula em grupo</button>
+            </form>
+            <div id="lista-minhas-aulas"></div>
+        </section>
+    </div>
+
+    <!-- COORDENAÇÃO -->
+    <div id="view-coordenador" hidden>
+        <section class="section">
+            <div class="section-head"><h2 id="painel-titulo">Visão geral da escola</h2><span class="count" id="painel-atualizado"></span></div>
+            <dl class="stats" id="painel-resumo"></dl>
+        </section>
+        <section class="section" id="sec-defasagem">
+            <div class="section-head"><h2>Defasagem por matéria</h2></div>
+            <div class="tabela-rolagem">
+                <table id="tabela-painel">
+                    <thead><tr><th>Matéria</th><th>Pedidos</th><th>Atendidos</th><th>Defasagem</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section" id="sec-denuncias">
+            <div class="section-head"><h2>Denúncias</h2><span class="count" id="count-denuncias"></span></div>
+            <div id="lista-denuncias"></div>
+        </section>
+        <section class="section" id="sec-monitores">
+            <div class="section-head"><h2>Monitores</h2></div>
+            <div class="tabela-rolagem">
+                <table id="tabela-monitores">
+                    <thead><tr><th>Monitor(a)</th><th>Monitorias</th><th>Concluídas</th><th>Reputação</th><th>Situação</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section" id="sec-senhas">
+            <div class="section-head"><h2>Redefinir senha de usuário</h2></div>
+            <form id="form-redefinir" class="card">
+                <p class="muted" style="font-size:.92rem">Quando um aluno ou monitor esquecer a senha, digite o e-mail dele.
+                    O sistema gera uma senha temporária para você passar; no próximo login ele cria uma senha nova.</p>
+                <div class="field-row" style="align-items:flex-end">
+                    <div class="field">
+                        <label for="redef-id">E-mail</label>
+                        <input type="text" id="redef-id" maxlength="150" autocomplete="off" required>
+                    </div>
+                    <div class="field" style="flex:0 0 auto">
+                        <button type="submit" class="btn btn-primary">Gerar senha temporária</button>
+                    </div>
+                </div>
+                <div id="redef-resultado" class="citacao" hidden></div>
+            </form>
+        </section>
+        <section class="section" id="sec-suspensos">
+            <div class="section-head"><h2>Contas suspensas</h2></div>
+            <div id="lista-suspensos"></div>
+        </section>
+    </div>
+
+    <!-- MONITORIAS + CHAT (aluno e monitor) -->
+    <section class="section" id="section-matches" hidden>
+        <div class="section-head"><h2>Minhas monitorias</h2><span class="count" id="count-matches"></span></div>
+        <div class="grid-2">
+            <div id="lista-matches"></div>
+            <div>
+                <div class="chat-box" id="chat-box" hidden>
+                    <div class="chat-head">
+                        <div>
+                            <div class="item-title" id="chat-titulo"></div>
+                            <div class="item-meta" id="chat-subtitulo"></div>
+                        </div>
+                        <div class="chat-acoes">
+                            <a class="btn btn-sm btn-meet" id="btn-meet" target="_blank" rel="noopener" hidden><i data-icone="video"></i> Entrar na reunião (Meet)</a>
+                            <button type="button" class="btn btn-ghost btn-sm" id="btn-definir-meet">Link do Meet</button>
+                            <button type="button" class="btn btn-ghost btn-sm" id="btn-perfil-conversa">Ver perfil</button>
+                            <button type="button" class="btn btn-ghost btn-sm" id="btn-encerrar">Encerrar</button>
+                            <button type="button" class="btn btn-ghost btn-sm btn-perigo" id="btn-denunciar">Denunciar</button>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chat-messages" aria-live="polite"></div>
+                    <form class="chat-input" id="form-chat">
+                        <input type="text" id="chat-texto" placeholder="Digite uma mensagem..." maxlength="1000"
+                               autocomplete="off" aria-label="Mensagem">
+                        <button type="submit" class="btn btn-primary enviar" title="Enviar" aria-label="Enviar"><i data-icone="enviar"></i></button>
+                    </form>
+                    <div class="chat-rodape" id="chat-rodape" hidden></div>
+                </div>
+                <div class="empty-state" id="chat-vazio">Selecione uma monitoria para abrir o chat.</div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- ======================= PERFIL ======================= -->
+<div id="view-perfil" hidden>
+    <div class="voltar-linha">
+        <a href="dashboard.html#painel" class="btn btn-ghost btn-sm">← Voltar ao painel</a>
+        <a href="index.html" class="btn btn-ghost btn-sm"><i data-icone="casa"></i> Início</a>
+    </div>
+    <div class="card" id="perfil-conteudo"><div class="carregando">Carregando...</div></div>
+    <form class="card" id="form-perfil" hidden style="margin-top:16px">
+        <h2>Editar perfil</h2>
+        <div class="field">
+            <label for="perfil-nome">Nome completo <span class="obrigatorio">*</span></label>
+            <input type="text" id="perfil-nome" minlength="3" maxlength="150" required>
+        </div>
+        <div class="field">
+            <label for="perfil-bio">Sobre você</label>
+            <textarea id="perfil-bio" maxlength="300" placeholder="Ex.: curto matemática e posso ajudar com exercícios de função."></textarea>
+            <div class="contador" id="perfil-contador">0/300</div>
+        </div>
+        <div class="item-actions">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+            <button type="button" class="btn btn-ghost" id="perfil-cancelar">Cancelar</button>
+        </div>
+    </form>
+</div>
+
+</main>
+
+<footer id="rodape"></footer>
+
+<dialog id="dialogo" aria-labelledby="dialogo-titulo">
+    <form method="dialog" id="dialogo-form">
+        <h3 id="dialogo-titulo"></h3>
+        <p id="dialogo-texto" class="muted"></p>
+        <div class="field" id="dialogo-campo-opcoes" hidden>
+            <label for="dialogo-opcoes" id="dialogo-rotulo-opcoes"></label>
+            <select id="dialogo-opcoes"></select>
+        </div>
+        <div class="field" id="dialogo-campo" hidden>
+            <label for="dialogo-entrada" id="dialogo-rotulo"></label>
+            <textarea id="dialogo-entrada" maxlength="500"></textarea>
+        </div>
+        <div class="dialogo-botoes">
+            <button type="button" class="btn btn-ghost" id="dialogo-cancelar">Voltar</button>
+            <button type="submit" class="btn btn-primary" id="dialogo-confirmar" value="ok">Confirmar</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="dialogo-conversa" class="dialogo-largo" aria-labelledby="conversa-titulo">
+    <div class="dialogo-topo">
+        <div><h3 id="conversa-titulo">Conversa</h3><div class="item-meta" id="conversa-subtitulo"></div></div>
+        <button type="button" class="btn btn-ghost btn-sm" id="conversa-fechar">Fechar</button>
+    </div>
+    <div class="chat-messages chat-leitura" id="conversa-mensagens"></div>
+</dialog>
+
+<dialog id="dialogo-senha" aria-labelledby="senha-titulo">
+    <form id="form-senha">
+        <h3 id="senha-titulo">Trocar senha</h3>
+        <p class="muted" id="senha-texto"></p>
+        <div class="field">
+            <label for="senha-atual" id="senha-atual-rotulo">Senha atual</label>
+            <input type="password" id="senha-atual" autocomplete="current-password" required>
+        </div>
+        <div class="field">
+            <label for="senha-nova">Nova senha (mínimo 6 caracteres)</label>
+            <input type="password" id="senha-nova" autocomplete="new-password" minlength="6" maxlength="128" required>
+        </div>
+        <div class="field">
+            <label for="senha-nova2">Repita a nova senha</label>
+            <input type="password" id="senha-nova2" autocomplete="new-password" minlength="6" maxlength="128" required>
+        </div>
+        <div class="msg" id="senha-erro" role="alert"></div>
+        <div class="dialogo-botoes">
+            <button type="button" class="btn btn-ghost" id="senha-cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar senha</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="dialogo-excluir" aria-labelledby="excluir-titulo">
+    <form id="form-excluir">
+        <h3 id="excluir-titulo">Excluir minha conta</h3>
+        <div id="excluir-passo-senha">
+            <p class="muted">Isso apaga <strong>para sempre</strong> a sua conta e tudo que é dela: pedidos de ajuda,
+                monitorias, aulas em grupo que você dá, conversas e avaliações.
+                Para ter certeza que é você, vamos mandar um código para o seu e-mail.</p>
+            <div class="field">
+                <label for="excluir-senha">Sua senha</label>
+                <input type="password" id="excluir-senha" autocomplete="current-password" maxlength="128" required>
+            </div>
+            <label class="caixa-ciente"><input type="checkbox" id="excluir-ciente"> Entendo que a exclusão não tem volta.</label>
+        </div>
+        <div id="excluir-passo-codigo" hidden>
+            <p class="muted" id="excluir-texto-codigo"></p>
+            <div class="field" id="excluir-campo-codigo">
+                <label for="excluir-codigo">Código do e-mail</label>
+                <input type="text" id="excluir-codigo" class="campo-codigo" inputmode="numeric" autocomplete="one-time-code"
+                       pattern="\d{6}" maxlength="6" placeholder="000000">
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="excluir-reenviar">Mandar outro código</button>
+        </div>
+        <div class="msg" id="excluir-erro" role="alert"></div>
+        <div class="dialogo-botoes">
+            <button type="button" class="btn btn-ghost" id="excluir-cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="excluir-enviar">Continuar</button>
+            <button type="submit" class="btn btn-perigo-cheio" id="excluir-confirmar" hidden>Excluir definitivamente</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="dialogo-perfil" class="dialogo-largo" aria-label="Perfil">
+    <div class="dialogo-topo"><span></span><button type="button" class="btn btn-ghost btn-sm" id="perfil-modal-fechar">Fechar</button></div>
+    <div id="perfil-modal-conteudo"></div>
+</dialog>
+
+<div class="msg toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="api.js"></script>
+<script src="layout.js"></script>
+<script src="dashboard.js"></script>
+</body>
+</html>

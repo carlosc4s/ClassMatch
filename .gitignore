@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+backend/bibliotecas/
+
+# Variáveis de ambiente (contém a senha do banco — nunca versionar)
+.env
+.env.*
+*.env
+backend/.env.txt
+!.env.example
+!backend/.env.example
+
+# Chave que assina os logins (o backend gera sozinho na primeira vez)
+backend/.chave_secreta
+
+# Arquivos e áudios enviados no chat
+backend/uploads/
+
+# Editor (as configurações do projeto vão junto)
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+
+# Caminho do Python deste computador (cada PC tem o seu)
+backend/python_caminho.txt
+
+# Arquivos do sistema e logs
+Thumbs.db
+desktop.ini
+.DS_Store
+*.log
+
+# Bancos/backups locais (podem ter dados reais de usuários)
+*.sqlite
+*.db
+*.dump
+*.bak

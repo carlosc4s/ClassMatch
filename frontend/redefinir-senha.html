@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>ClassMatch — Criar nova senha</title>
+<link rel="icon" href="img/simbolo-claro.png">
+<script>try{document.documentElement.dataset.tema=localStorage.getItem('classmatch_tema')||(matchMedia('(prefers-color-scheme: dark)').matches?'escuro':'claro')}catch(e){document.documentElement.dataset.tema='claro'}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topo"></header>
+
+<main class="container" style="max-width:520px">
+    <div class="voltar-linha"><a href="entrar.html" class="btn btn-ghost btn-sm">← Voltar para o login</a></div>
+    <div class="card">
+        <h1 style="font-size:1.6rem">Criar nova senha</h1>
+        <p class="muted" id="red-intro">Digite o código de 6 números que enviamos para o seu e-mail.</p>
+        <div id="red-msg" class="msg" role="alert" aria-live="polite"></div>
+        <form id="form-redefinir-senha">
+            <div class="field" id="campo-red-email" hidden>
+                <label for="red-email">E-mail da conta <span class="obrigatorio">*</span></label>
+                <input type="email" id="red-email" autocomplete="email" maxlength="150">
+            </div>
+            <div class="field">
+                <label for="red-codigo">Código do e-mail <span class="obrigatorio">*</span></label>
+                <input type="text" id="red-codigo" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+                       pattern="[0-9]{6}" required style="font-size:1.4rem;letter-spacing:.3em;text-align:center">
+            </div>
+            <div class="field">
+                <label for="red-senha">Nova senha (mínimo 6 caracteres) <span class="obrigatorio">*</span></label>
+                <input type="password" id="red-senha" autocomplete="new-password" minlength="6" maxlength="128" required>
+            </div>
+            <div class="field">
+                <label for="red-senha2">Repita a nova senha <span class="obrigatorio">*</span></label>
+                <input type="password" id="red-senha2" autocomplete="new-password" minlength="6" maxlength="128" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Salvar nova senha</button>
+        </form>
+        <p class="muted" style="margin:16px 0 0;font-size:.9rem">Não recebeu ou o link venceu? <a href="entrar.html#esqueci">Pedir um novo</a>.</p>
+    </div>
+</main>
+
+<footer id="rodape"></footer>
+<script src="api.js"></script>
+<script src="layout.js"></script>
+<script>
+    // O token vem do link do e-mail. Sai da barra de endereço (fica só nesta aba).
+    const CHAVE_LINK = 'classmatch_link_senha';
+    const daUrl = new URLSearchParams(location.search).get('token');
+    if (daUrl) {
+        sessionStorage.setItem(CHAVE_LINK, daUrl);
+        history.replaceState(null, '', 'redefinir-senha.html');
+    }
+    const token = daUrl || sessionStorage.getItem(CHAVE_LINK);
+    const caixa = document.getElementById('red-msg');
+    const formulario = document.getElementById('form-redefinir-senha');
+    function mostrar(texto, tipo) { caixa.textContent = texto; caixa.className = `msg show ${tipo}`; }
+
+    async function iniciar() {
+        if (!token) { // abriu sem o link: pede o e-mail também
+            document.getElementById('campo-red-email').hidden = false;
+            document.getElementById('red-email').required = true;
+            document.getElementById('red-intro').textContent = 'Digite o e-mail da sua conta e o código de 6 números que você recebeu.';
+            return;
+        }
+        try {
+            const resposta = await api.linkSenha(token);
+            document.getElementById('red-intro').textContent =
+                `Conta ${resposta.email}. Digite o código de 6 números do e-mail e crie sua senha nova.`;
+            document.getElementById('red-codigo').focus();
+        } catch (err) {
+            sessionStorage.removeItem(CHAVE_LINK);
+            formulario.hidden = true;
+            mostrar(err.message, 'error');
+        }
+    }
+
+    formulario.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const senha = document.getElementById('red-senha').value;
+        if (senha !== document.getElementById('red-senha2').value) { mostrar('As duas senhas não são iguais.', 'error'); return; }
+        const botao = formulario.querySelector('button[type="submit"]');
+        botao.disabled = true;
+        botao.textContent = 'Salvando…';
+        try {
+            const dados = { codigo: document.getElementById('red-codigo').value.trim(), nova_senha: senha };
+            if (token) dados.token = token; else dados.email = document.getElementById('red-email').value.trim();
+            const resposta = await api.redefinirSenha(dados);
+            sessionStorage.removeItem(CHAVE_LINK);
+            sessao.salvar(resposta.token, resposta.usuario);
+            mostrar(resposta.mensagem, 'ok');
+            setTimeout(() => { window.location.href = 'dashboard.html'; }, 900);
+        } catch (err) {
+            mostrar(err.message, 'error');
+            botao.disabled = false;
+            botao.textContent = 'Salvar nova senha';
+        }
+    });
+    iniciar();
+</script>
+</body>
+</html>

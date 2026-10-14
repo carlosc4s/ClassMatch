@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClassMatch — Entrar ou criar conta</title>
+<link rel="icon" href="img/simbolo-claro.png">
+<script>try{document.documentElement.dataset.tema=localStorage.getItem('classmatch_tema')||(matchMedia('(prefers-color-scheme: dark)').matches?'escuro':'claro')}catch(e){document.documentElement.dataset.tema='claro'}</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topo"></header>
+
+<main>
+    <div class="auth-shell">
+        <aside class="card auth-lado">
+            <img src="img/logo-claro.png" alt="Logo ClassMatch" class="so-claro">
+            <img src="img/logo-escuro.png" alt="Logo ClassMatch" class="so-escuro">
+            <p class="muted">Monitoria entre alunos da sua escola.</p>
+            <ul>
+                <li><i data-icone="alvo"></i> Match por matéria e nível</li>
+                <li><i data-icone="mensagem"></i> Chat moderado pela escola</li>
+                <li><i data-icone="escudo"></i> Ambiente moderado pela escola</li>
+            </ul>
+        </aside>
+
+        <div class="card auth-card">
+            <div class="voltar-linha"><a href="index.html" class="btn btn-ghost btn-sm">← Voltar para o início</a></div>
+            <h1>Bem-vindo(a)</h1>
+            <p class="muted">Entre com seu e-mail ou crie sua conta.</p>
+
+            <div class="tabs" role="tablist">
+                <button type="button" class="tab-btn active" data-tab="login" role="tab">Entrar</button>
+                <button type="button" class="tab-btn" data-tab="cadastro" role="tab">Criar conta</button>
+            </div>
+
+            <div id="msg-box" class="msg" role="alert" aria-live="polite"></div>
+
+            <div class="tab-panel active" id="panel-login">
+                <form id="form-login">
+                    <div class="field">
+                        <label for="login-email">E-mail <span class="obrigatorio">*</span></label>
+                        <input type="email" id="login-email" placeholder="seu.email@gmail.com"
+                               autocomplete="username" autocapitalize="off" spellcheck="false" required>
+                    </div>
+                    <div class="field">
+                        <label for="login-senha">Senha <span class="obrigatorio">*</span></label>
+                        <input type="password" id="login-senha" autocomplete="current-password" required>
+                    </div>
+                    <p style="text-align:right;margin:-6px 0 14px;font-size:.88rem">
+                        <a href="#esqueci" data-ir-para="esqueci">Esqueci minha senha</a></p>
+                    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                </form>
+                <p class="muted" style="margin-top:14px;font-size:.9rem">Ainda não tem conta?
+                    <a href="#cadastro" data-ir-para="cadastro">Crie agora</a>.</p>
+
+                <details class="contas-teste">
+                    <summary>Contas de teste (senha: senha123)</summary>
+                    <div class="contas-teste-lista">
+                        <button type="button" class="btn btn-ghost btn-sm" data-email="aluno.demo@escola.sp.gov.br">Aluno</button>
+                        <button type="button" class="btn btn-ghost btn-sm" data-email="monitor.demo@escola.sp.gov.br">Monitora</button>
+                        <button type="button" class="btn btn-ghost btn-sm" data-email="coordenacao@escola.sp.gov.br">Coordenação</button>
+                    </div>
+                </details>
+            </div>
+
+            <div class="tab-panel" id="panel-esqueci">
+                <h2 style="font-size:1.15rem">Recuperar senha</h2>
+                <form id="form-esqueci">
+                    <p class="muted" style="font-size:.9rem">Digite o e-mail da sua conta. Vamos mandar um link para você criar uma senha nova.</p>
+                    <div class="field">
+                        <label for="esq-email">E-mail <span class="obrigatorio">*</span></label>
+                        <input type="email" id="esq-email" autocomplete="email" maxlength="150" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Enviar link</button>
+                </form>
+                <p id="esq-enviado" class="muted" hidden style="font-size:.9rem">Abra o e-mail e clique em
+                    <strong>Redefinir minha senha</strong>. Se o link não abrir, <a href="redefinir-senha.html">digite o código aqui</a>.</p>
+                <p class="muted" style="margin-top:14px;font-size:.9rem">
+                    <a href="#login" data-ir-para="login">Voltar para o login</a></p>
+            </div>
+
+            <div class="tab-panel" id="panel-cadastro">
+                <form id="form-cadastro">
+                    <p class="muted" style="font-size:.85rem">Campos com <span class="obrigatorio">*</span> são obrigatórios.</p>
+                    <div class="field">
+                        <label for="cad-nome">Nome completo <span class="obrigatorio">*</span></label>
+                        <input type="text" id="cad-nome" autocomplete="name" minlength="3" maxlength="150" required>
+                    </div>
+                    <div class="field" id="campo-escola" hidden>
+                        <label for="cad-escola">Escola <span class="obrigatorio">*</span></label>
+                        <select id="cad-escola"></select>
+                    </div>
+                    <div class="field">
+                        <label for="cad-email">E-mail <span class="obrigatorio">*</span></label>
+                        <input type="email" id="cad-email" placeholder="seu.email@gmail.com" autocomplete="email" maxlength="150" required>
+                    </div>
+                    <div class="field">
+                        <label for="cad-nasc">Data de nascimento <span class="obrigatorio">*</span></label>
+                        <input type="date" id="cad-nasc" required>
+                    </div>
+                    <p class="field-dica">Não precisa escolher agora: no painel você decide se quer aprender, ensinar ou os dois.</p>
+                    <div class="field">
+                        <label for="cad-senha">Senha (mínimo 6 caracteres) <span class="obrigatorio">*</span></label>
+                        <input type="password" id="cad-senha" autocomplete="new-password" minlength="6" maxlength="128" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Criar minha conta</button>
+                </form>
+
+                <!-- 2º passo: confirmar o e-mail com o código de 6 números -->
+                <form id="form-codigo-cadastro" hidden>
+                    <h2 style="font-size:1.15rem">Confirme seu e-mail</h2>
+                    <p class="muted" style="font-size:.9rem" id="cad-codigo-texto"></p>
+                    <div class="field">
+                        <label for="cad-codigo">Código de 6 números <span class="obrigatorio">*</span></label>
+                        <input type="text" id="cad-codigo" class="campo-codigo" inputmode="numeric" autocomplete="one-time-code"
+                               pattern="\d{6}" maxlength="6" placeholder="000000" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Confirmar e criar conta</button>
+                    <div class="item-actions" style="margin-top:12px">
+                        <button type="button" class="btn btn-ghost btn-sm" id="cad-reenviar">Mandar outro código</button>
+                        <button type="button" class="btn btn-ghost btn-sm" id="cad-voltar">Corrigir meus dados</button>
+                    </div>
+                </form>
+                <p class="muted" style="margin-top:14px;font-size:.9rem">Já tem conta?
+                    <a href="#login" data-ir-para="login">Entrar</a>.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer id="rodape"></footer>
+<script src="api.js"></script>
+<script src="layout.js"></script>
+<script src="login.js"></script>
+</body>
+</html>

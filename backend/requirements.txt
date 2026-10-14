@@ -1,0 +1,7 @@
+# Bibliotecas do backend. O instalar.bat baixa tudo para a pasta backend/bibliotecas:
+#   python -m pip install -r requirements.txt --target bibliotecas
+# Versoes com faixa (>=) em vez de numero fixo: instalam em qualquer Python 3.8+.
+Flask>=3.0,<4
+PyMySQL>=1.1           # banco MySQL (no computador)
+psycopg2-binary>=2.9   # banco PostgreSQL (Supabase)
+cryptography>=42       # login do MySQL 8
