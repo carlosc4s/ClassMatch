@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /redefinir-senha.html
+Disallow: /api/
+
+Sitemap: https://class-match-khaki.vercel.app/sitemap.xml
