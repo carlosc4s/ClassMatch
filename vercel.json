@@ -1,15 +1,22 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "",
+  "buildCommand": "echo \"site estatico: pasta frontend\"",
   "outputDirectory": "frontend",
   "functions": {
     "api/index.py": {
-      "includeFiles": "{backend,database}/**",
+      "includeFiles": "{backend,frontend,database}/**",
       "maxDuration": 30
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index" }
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/api/index"
+    }
   ]
 }
