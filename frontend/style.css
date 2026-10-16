@@ -426,7 +426,7 @@ td.vazio { text-align: center; color: var(--texto-suave); padding: 24px; }
 
 /* ---------------------------------------------------------------- chat */
 .chat-box {
-    display: flex; flex-direction: column; height: 560px;
+    display: flex; flex-direction: column; height: clamp(560px, calc(100vh - 160px), 820px);
     background: var(--superficie); border: 1px solid var(--linha); border-radius: var(--raio);
     box-shadow: var(--sombra); overflow: hidden;
 }
@@ -529,9 +529,15 @@ dialog::backdrop { background: rgba(5, 7, 26, .6); backdrop-filter: blur(2px); }
     .marca .nome { display: none; }
     .container { padding: 22px 16px; }
     .field-row { flex-direction: column; gap: 0; }
-    .chat-box { height: 75vh; min-height: 420px; }
+    /* No celular o chat ocupa quase a tela toda; dvh desconta a barra do navegador. */
+    .chat-box { height: 88vh; height: 88dvh; min-height: 460px; }
     .chat-msg { max-width: 90%; }
-    .chat-head { flex-direction: column; }
+    .chat-head { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 14px; }
+    /* Em coluna, o flex-basis de 200px virava altura e deixava um bloco vazio. */
+    .chat-head > div:first-child { flex: none; }
+    .chat-acoes { justify-content: flex-start; }
+    .chat-messages { padding: 12px; }
+    .chat-input { padding: 8px 10px; }
     .avaliacao-linha { flex-direction: column; }
     .rodape-interno { grid-template-columns: 1fr; }
     .compat { margin-left: 0; }
