@@ -160,8 +160,31 @@ def pagina_inicial():
 # ----------------------------------------------------------------------------
 def db():
     if 'banco' not in g:
+        atualizar_banco_na_vercel()
         g.banco = Banco(cfg)
     return g.banco
+
+
+_banco_atualizado = False
+
+
+def atualizar_banco_na_vercel():
+    """No computador, o INICIAR.bat atualiza o banco ao ligar (verificar_banco_no_inicio).
+    Na Vercel ele nunca roda, então a primeira requisição de cada instância faz isso.
+    Os comandos podem repetir: o que já existe só falha e é ignorado."""
+    global _banco_atualizado
+    if _banco_atualizado or not config.NA_VERCEL:
+        return
+    _banco_atualizado = True
+    try:
+        conexao = conectar(cfg)
+    except ErroBanco:
+        _banco_atualizado = False  # tenta de novo na próxima requisição
+        return
+    try:
+        atualizar_banco(conexao, cfg)
+    finally:
+        conexao.close()
 
 
 @app.teardown_request
