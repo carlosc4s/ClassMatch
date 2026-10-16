@@ -81,7 +81,10 @@ from banco import (COLUNA_FALTANDO, ERROS_BANCO, TABELA_FALTANDO, Banco, ErroApi
 
 cfg = config.carregar()
 
-NIVEIS = ('basico', 'intermediario', 'avancado')
+# Escolaridade, da menor para a maior: vale para o pedido do aluno e para a matéria do monitor.
+NIVEIS = ('fundamental_1', 'fundamental_2', 'medio', 'superior', 'pos')
+# Pedidos e matérias cadastrados antes da troca (básico/intermediário/avançado).
+NIVEIS_ANTIGOS = {'basico': 'fundamental_2', 'intermediario': 'medio', 'avancado': 'superior'}
 TIPOS_COORDENACAO = ('coordenador', 'admin')
 # 'aluno' e 'monitor' são a mesma conta de estudante: todo mundo pode pedir ajuda E ensinar.
 # O papel vale por monitoria (quem pediu é o aluno dela, quem aceitou é o monitor).
@@ -249,7 +252,7 @@ def inteiro(valor, rotulo):
 def ler_nivel(valor):
     nivel = filtro.normalizar(str(valor or '').strip())
     if nivel not in NIVEIS:
-        raise ErroApi(400, 'Escolha um nível: básico, intermediário ou avançado.')
+        raise ErroApi(400, 'Escolha a escolaridade: Fundamental I, Fundamental II, Ensino Médio, Ensino Superior ou Pós-graduação.')
     return nivel
 
 
@@ -278,7 +281,9 @@ def calcular_faixa_etaria(nascimento):
 
 
 def calcular_score(nivel_monitor, nivel_pedido):
-    """Compatibilidade do match (0-100): nível do monitor x nível da dúvida."""
+    """Compatibilidade do match (0-100): escolaridade que o monitor ensina x escolaridade do aluno."""
+    nivel_monitor = NIVEIS_ANTIGOS.get(nivel_monitor, nivel_monitor)
+    nivel_pedido = NIVEIS_ANTIGOS.get(nivel_pedido, nivel_pedido)
     try:
         diferenca = NIVEIS.index(nivel_monitor) - NIVEIS.index(nivel_pedido)
     except ValueError:
@@ -286,7 +291,7 @@ def calcular_score(nivel_monitor, nivel_pedido):
     if diferenca == 0:
         return 100
     if diferenca > 0:
-        return 85  # monitor sabe mais do que a dúvida exige
+        return 85  # monitor ensina uma escolaridade acima da do aluno
     return 60 if diferenca == -1 else 40
 
 
@@ -637,7 +642,7 @@ def adicionar_minha_materia():
         db().executar('UPDATE monitor_materias SET nivel_conhecimento = %s, ativo = TRUE WHERE id = %s',
                       (nivel, existente['id']))
         db().commit()
-        return jsonify({'id': existente['id'], 'mensagem': f'{materia["nome"]}: nível atualizado.'})
+        return jsonify({'id': existente['id'], 'mensagem': f'{materia["nome"]}: escolaridade atualizada.'})
 
     novo_id = db().inserir(
         'INSERT INTO monitor_materias (usuario_id, materia_id, nivel_conhecimento) VALUES (%s, %s, %s)',
@@ -771,7 +776,7 @@ def solicitacoes_pendentes():
 
 # ============================================================================
 # ROTAS — MATCHES (o monitor aceita um pedido -> nasce o match e a conversa)
-# Score de compatibilidade: 100 se o nível do monitor é igual ao da dúvida,
+# Score de compatibilidade: 100 se o monitor ensina a mesma escolaridade do aluno,
 # 85 se o monitor sabe mais, 60/40 se sabe menos.
 # ============================================================================
 @app.post('/api/matches')

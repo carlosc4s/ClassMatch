@@ -378,6 +378,13 @@ ATUALIZACOES = {
            )""",
         'CREATE INDEX IF NOT EXISTS idx_codigos_email ON codigos_email(email, finalidade)',
         'ALTER TABLE codigos_email ENABLE ROW LEVEL SECURITY',
+        # v6.5: nível vira escolaridade (os valores antigos continuam valendo nos registros que já existem;
+        # 'nao_sei' veio de uma prévia que usou o mesmo banco)
+        'ALTER TABLE solicitacoes_ajuda DROP CONSTRAINT IF EXISTS solicitacoes_ajuda_nivel_dificuldade_check',
+        'ALTER TABLE solicitacoes_ajuda DROP CONSTRAINT IF EXISTS ck_solic_nivel',  # da prévia do "Não sei dizer"
+        "ALTER TABLE solicitacoes_ajuda ADD CONSTRAINT ck_solic_escolaridade CHECK (nivel_dificuldade IN ('fundamental_1','fundamental_2','medio','superior','pos','basico','intermediario','avancado','nao_sei'))",
+        'ALTER TABLE monitor_materias DROP CONSTRAINT IF EXISTS monitor_materias_nivel_conhecimento_check',
+        "ALTER TABLE monitor_materias ADD CONSTRAINT ck_mm_escolaridade CHECK (nivel_conhecimento IN ('fundamental_1','fundamental_2','medio','superior','pos','basico','intermediario','avancado','nao_sei'))",
     ],
 }
 
@@ -390,3 +397,29 @@ def atualizar_banco(conexao, cfg):
             conexao.commit()
         except ERROS_BANCO:
             conexao.rollback()  # já existia (ou o banco ainda não tem as tabelas base)
+    if cfg.DB_TIPO == 'mysql':
+        liberar_escolaridade_mysql(conexao)
+
+
+def liberar_escolaridade_mysql(conexao):
+    """v6.5: no MySQL o CHECK do nível tem nome automático; troca pelo que aceita a escolaridade."""
+    for tabela, coluna, nome in (('solicitacoes_ajuda', 'nivel_dificuldade', 'ck_solic_escolaridade'),
+                                 ('monitor_materias', 'nivel_conhecimento', 'ck_mm_escolaridade')):
+        try:
+            with conexao.cursor() as cursor:
+                cursor.execute(
+                    """SELECT cc.CONSTRAINT_NAME AS nome, cc.CHECK_CLAUSE AS regra
+                       FROM information_schema.CHECK_CONSTRAINTS cc
+                       JOIN information_schema.TABLE_CONSTRAINTS tc
+                         ON tc.CONSTRAINT_SCHEMA = cc.CONSTRAINT_SCHEMA AND tc.CONSTRAINT_NAME = cc.CONSTRAINT_NAME
+                       WHERE tc.CONSTRAINT_SCHEMA = DATABASE() AND tc.TABLE_NAME = %s AND cc.CHECK_CLAUSE LIKE %s""",
+                    (tabela, f'%{coluna}%'))
+                regras = cursor.fetchall()
+                if not regras or any(r['nome'] == nome for r in regras):
+                    continue
+                for regra in regras:
+                    cursor.execute(f"ALTER TABLE {tabela} DROP CHECK `{regra['nome']}`")
+                cursor.execute(f"ALTER TABLE {tabela} ADD CONSTRAINT {nome} CHECK ({coluna} IN ('fundamental_1','fundamental_2','medio','superior','pos','basico','intermediario','avancado','nao_sei'))")
+            conexao.commit()
+        except ERROS_BANCO:
+            conexao.rollback()  # MySQL antigo sem CHECK: não há nada a liberar
