@@ -254,7 +254,7 @@ const carregarMinhasSolicitacoes = semSobreposicao(async () => {
             h('span', { class: 'item-title' }, s.materia_nome),
             selo(s.status)),
         h('div', { class: 'item-meta' },
-            `Nível ${NIVEIS[s.nivel_dificuldade].toLowerCase()} · ${formatarData(s.data_criacao)}`,
+            `${NIVEIS[s.nivel_dificuldade]} · ${formatarData(s.data_criacao)}`,
             s.monitor_nome ? ` · monitor(a): ${s.monitor_nome}` : ''),
         s.descricao_duvida ? h('p', { class: 'item-texto' }, s.descricao_duvida) : null,
         (s.status === 'pendente' || s.conversa_id) ? h('div', { class: 'item-actions' },
@@ -363,8 +363,8 @@ const carregarPendentes = semSobreposicao(async () => {
             h('span', { class: 'badge' }, formatarData(s.data_criacao))),
         h('div', { class: 'info-match' },
             h('span', null, `Quer aprender: ${s.materia_nome}`),
-            h('span', null, `Dúvida: ${NIVEIS[s.nivel_dificuldade]}`),
-            h('span', null, `Seu nível: ${NIVEIS[s.meu_nivel]}`)),
+            h('span', null, `Escolaridade do aluno: ${NIVEIS[s.nivel_dificuldade]}`),
+            h('span', null, `Você ensina: ${NIVEIS[s.meu_nivel]}`)),
         s.descricao_duvida ? h('p', { class: 'item-texto' }, s.descricao_duvida) : null,
         h('div', { class: 'item-actions' },
             h('button', { type: 'button', class: 'btn btn-ghost btn-sm', onclick: () => verPerfil(s.aluno_id) }, 'Ver perfil'),
@@ -472,7 +472,7 @@ async function abrirChat(conversaId, rolarAte = false) {
     $('chat-titulo').textContent = m.tipo === 'aula' ? `Aula em grupo: ${m.titulo}` : m.materia_nome;
     $('chat-subtitulo').textContent = m.tipo === 'aula'
         ? `${m.materia_nome} · ${formatarData(m.data_hora)} · ${m.inscritos} de ${m.vagas} vagas`
-        : `com ${m.com_quem} · dúvida de nível ${NIVEIS[m.nivel_dificuldade].toLowerCase()}`;
+        : `com ${m.com_quem} · ${NIVEIS[m.nivel_dificuldade]}`;
     $('chat-messages').replaceChildren();
     document.querySelectorAll('#lista-matches .item-clicavel').forEach(item => {
         const esta = Number(item.dataset.conversa) === conversaId;

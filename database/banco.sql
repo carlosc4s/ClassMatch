@@ -87,7 +87,7 @@ CREATE TABLE monitor_materias (
     usuario_id              INT NOT NULL,
     materia_id              INT NOT NULL,
     nivel_conhecimento      VARCHAR(20) NOT NULL
-                                CHECK (nivel_conhecimento IN ('basico','intermediario','avancado')),
+                                CHECK (nivel_conhecimento IN ('fundamental_1','fundamental_2','medio','superior','pos')),
     ativo                   BOOLEAN NOT NULL DEFAULT TRUE,
     UNIQUE KEY uk_usuario_materia (usuario_id, materia_id),
     CONSTRAINT fk_mm_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
@@ -117,7 +117,7 @@ CREATE TABLE solicitacoes_ajuda (
     aluno_id                INT NOT NULL,
     materia_id              INT NOT NULL,
     nivel_dificuldade       VARCHAR(20) NOT NULL
-                                CHECK (nivel_dificuldade IN ('basico','intermediario','avancado')),
+                                CHECK (nivel_dificuldade IN ('fundamental_1','fundamental_2','medio','superior','pos')),
     descricao_duvida        TEXT,
     -- pendente -> em_match (monitor aceitou, chat aberto) -> atendida (monitoria encerrada)
     -- pendente -> cancelada (o aluno desistiu)
@@ -434,13 +434,13 @@ INSERT INTO usuarios (instituicao_id, nome_completo, email_institucional,
 
 -- O que a monitora de teste ensina
 INSERT INTO monitor_materias (usuario_id, materia_id, nivel_conhecimento) VALUES
-(2, 1, 'avancado'),        -- Lógica de Programação
-(2, 4, 'intermediario'),   -- Matemática
-(2, 2, 'basico');          -- Banco de Dados
+(2, 1, 'superior'),        -- Lógica de Programação
+(2, 4, 'medio'),   -- Matemática
+(2, 2, 'medio');          -- Banco de Dados
 
 -- Uma monitoria que já aconteceu (para o painel e a reputação não começarem vazios)
 INSERT INTO solicitacoes_ajuda (aluno_id, materia_id, nivel_dificuldade, descricao_duvida, status) VALUES
-(3, 1, 'basico', 'Não entendi a diferença entre o laço while e o laço for.', 'atendida');   -- id 1
+(3, 1, 'medio', 'Não entendi a diferença entre o laço while e o laço for.', 'atendida');   -- id 1
 INSERT INTO matches (solicitacao_id, monitor_id, aluno_id, materia_id, score_compatibilidade, status, data_conclusao) VALUES
 (1, 2, 3, 1, 85, 'concluido', CURRENT_TIMESTAMP);                                              -- id 1
 INSERT INTO conversas (match_id, encerrada) VALUES (1, TRUE);                                    -- id 1
@@ -458,7 +458,7 @@ UPDATE usuarios SET reputacao_media = 5.00,
 
 -- Um pedido esperando monitor (aparece para a monitora de teste aceitar)
 INSERT INTO solicitacoes_ajuda (aluno_id, materia_id, nivel_dificuldade, descricao_duvida) VALUES
-(3, 4, 'basico', 'Não sei quando usar a fórmula de Bhaskara na equação do 2º grau.');          -- id 2
+(3, 4, 'medio', 'Não sei quando usar a fórmula de Bhaskara na equação do 2º grau.');          -- id 2
 
 -- Palavras extras do filtro do chat (o backend já tem uma lista própria;
 -- a coordenação pode acrescentar linhas aqui sem mexer no código).

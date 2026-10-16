@@ -247,7 +247,11 @@ function colocarIcones(raiz = document) {
     raiz.querySelectorAll('i[data-icone]').forEach(marca => marca.replaceWith(icone(marca.dataset.icone)));
 }
 
-const NIVEIS = { basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado' };
+const NIVEIS = {
+    fundamental_1: 'Fundamental I', fundamental_2: 'Fundamental II', medio: 'Ensino Médio',
+    superior: 'Ensino Superior', pos: 'Pós-graduação',
+    basico: 'Básico', intermediario: 'Intermediário', avancado: 'Avançado', nao_sei: 'Não informada',  // registros antigos
+};
 const TIPOS = { aluno: 'Estudante', monitor: 'Estudante', coordenador: 'Coordenação', admin: 'Administração' };
 
 function iniciais(nome) {
